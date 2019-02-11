@@ -1,0 +1,16 @@
+#! /bin/sh -xe
+
+module=core
+mkdir -p src/proto
+
+export OUT_DIR=src
+PROTOC_GEN_TS_PATH="./node_modules/.bin/protoc-gen-ts"
+protoc \
+    --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" \
+    --js_out="import_style=commonjs,binary:${OUT_DIR}" \
+    --ts_out="${OUT_DIR}" \
+    protobuf/${module}.proto
+
+mv src/protobuf/${module}_pb.js src/proto/${module}_google_temp.js
+mv src/protobuf/${module}_pb.d.ts src/proto/${module}_google.d.ts
+( echo "/* eslint-disable */" ; cat src/proto/${module}_google_temp.js) > src/proto/${module}_google.js
